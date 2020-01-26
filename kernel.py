@@ -1,6 +1,7 @@
+import os
+
 import cvxpy
 import numpy as np
-import os
 
 NUM_TEAMS = 1
 TEAM_SIZE = 5
@@ -23,7 +24,7 @@ if skills is None:
 
 schedule = np.array(
     [[1, 1, 0, 0],
-    [0, 0, 1, 1]])
+     [0, 0, 1, 1]])
 
 assignments = cvxpy.Variable((NUM_STUDENTS, NUM_EVENTS), boolean=True)
 teams = cvxpy.Variable((NUM_STUDENTS, NUM_TEAMS), boolean=True)
@@ -32,12 +33,12 @@ spe_aux = [[cvxpy.Variable(NUM_STUDENTS) for k in range(NUM_TEAMS)] for j in ran
 
 objective = cvxpy.sum(cvxpy.multiply(assignments, skills))
 
-students_per_team = [cvxpy.sum(teams[:, k]) <= TEAM_SIZE 
-                        for k in range(NUM_TEAMS)]
+students_per_team = [cvxpy.sum(teams[:, k]) <= TEAM_SIZE
+                     for k in range(NUM_TEAMS)]
 
-spe_aux_constraints = [spe_aux[j][k] <= assignments[:, j] 
-                        for j in range(NUM_EVENTS) 
-                        for k in range(NUM_TEAMS)]
+spe_aux_constraints = [spe_aux[j][k] <= assignments[:, j]
+                       for j in range(NUM_EVENTS)
+                       for k in range(NUM_TEAMS)]
 spe_aux_constraints += [spe_aux[j][k] <= teams[:, k]
                         for j in range(NUM_EVENTS)
                         for k in range(NUM_TEAMS)]
@@ -49,22 +50,23 @@ spe_aux_constraints += [spe_aux[j][k] >= assignments[:, j] + teams[:, k] - 1
 #                         for k in range(NUM_TEAMS)]
 
 students_per_event = spe_aux_constraints + [cvxpy.sum(spe_aux[j][k]) <= 2
-                                                for j in range(NUM_EVENTS)
-                                                for k in range(NUM_TEAMS)]
+                                            for j in range(NUM_EVENTS)
+                                            for k in range(NUM_TEAMS)]
 
 no_time_conflicts = [cvxpy.sum(cvxpy.multiply(assignments[i, :], schedule[h, :])) <= 1
-                        for i in range(NUM_STUDENTS)
-                        for h in range(NUM_SLOTS)]
+                     for i in range(NUM_STUDENTS)
+                     for h in range(NUM_SLOTS)]
 
 team_placement = [cvxpy.sum(teams[i, :]) <= 1 for i in range(NUM_STUDENTS)] + [
-                    cvxpy.sum(assignments[i, :]) <= NUM_EVENTS * cvxpy.sum(teams[i, :])
-                        for i in range(NUM_STUDENTS)]
+    cvxpy.sum(assignments[i, :]) <= NUM_EVENTS * cvxpy.sum(teams[i, :])
+    for i in range(NUM_STUDENTS)]
 
 # team_placement = [cvxpy.sum(teams[i, :]) == 1 for i in range(NUM_STUDENTS)]
-non_negativity = [teams >= 0, assignments >= 0] + [spe_aux[j][k] >= 0 for j in range(NUM_EVENTS) for k in range(NUM_TEAMS)]
+non_negativity = [teams >= 0, assignments >= 0] + [spe_aux[j][k] >= 0 for j in range(NUM_EVENTS) for k in
+                                                   range(NUM_TEAMS)]
 
-
-problem = cvxpy.Problem(cvxpy.Maximize(objective), constraints=non_negativity + students_per_team + students_per_event + no_time_conflicts + team_placement)
+problem = cvxpy.Problem(cvxpy.Maximize(objective),
+                        constraints=non_negativity + students_per_team + students_per_event + no_time_conflicts + team_placement)
 problem.solve(solver='CPLEX')
 print(problem.solution.opt_val)
 
@@ -88,7 +90,6 @@ for event in range(NUM_EVENTS):
     students, = np.where(event_assignments[:, event])
     print(f"Event {event} has students {students} participating")
 
-
 print("\n\nVerifying values")
 
 a = assignments.value
@@ -106,4 +107,3 @@ for j in range(NUM_EVENTS):
 # print(skills)
 # print(assignments.value > 0.5)
 # print(teams.value > 0.5)
-

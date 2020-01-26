@@ -1,23 +1,32 @@
-import numpy as np
 from tkinter import *
 from tkinter import filedialog, messagebox
+import numpy as np
 
 datafilename = ""
 schedulefilename = ""
 
-def dataChoose():
-    global datafilename
-    tk.filename = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("csv files","*.csv"),("all files","*.*")))
+
+def datachoose():
+    global datafilename, errorlbl
+    tk.filename = filedialog.askopenfilename(initialdir="/", title="Select file",
+                                             filetypes=(("csv files", "*.csv"), ("all files", "*.*")))
     if tk.filename != '':
         datafilelbl.config(text=tk.filename)
         datafilename = tk.filename
+        try: errorlbl.destroy()
+        except: pass
 
-def scheduleChoose():
-    global schedulefilename
-    tk.filename = filedialog.askopenfilename(initialdir = "/",title = "Select file",filetypes = (("csv files","*.csv"),("all files","*.*")))
+
+def schedulechoose():
+    global schedulefilename, errorlbl
+    tk.filename = filedialog.askopenfilename(initialdir="/", title="Select file",
+                                             filetypes=(("csv files", "*.csv"), ("all files", "*.*")))
     if tk.filename != '':
         schedulefilelbl.config(text=tk.filename)
         schedulefilename = tk.filename
+        try: errorlbl.destroy()
+        except: pass
+
 
 def schedule():
     try:
@@ -44,7 +53,8 @@ def schedule():
 
         for i in range(1, len(data)):
             for j in range(len(data[i])):
-                try: int(data[i][j])
+                try:
+                    int(data[i][j])
                 except:
                     if data[i][j] not in students and data[i][j] != '':
                         students.append(data[i][j])
@@ -67,7 +77,7 @@ def schedule():
         for s in range(len(students)):
             for i in range(len(data)):
                 for j in range(len(data[i])):
-                    #print(len(data[i]))
+                    # print(len(data[i]))
                     if data[i][j] == students[s]:
                         skills[s][j - 1] = i
 
@@ -75,11 +85,16 @@ def schedule():
         print(skills)
 
     except:
-        fileError()
+        fileerror()
 
-def fileError():
-    messagebox.showerror("File Error", "File error! Ensure that the correct files have been entered and the files have the correct formats!")
+
+def fileerror():
+    messagebox.showerror("File Error",
+                         "Ensure that the correct files have been entered and the files have the correct formats...")
+    errorlbl = Label(tk, text="", fg="white")
+    errorlbl.grid(row=4, column=1)
     errorlbl.config(text="File Error!", fg="red")
+
 
 tk = Tk()
 
@@ -88,16 +103,13 @@ tk.resizable(False, False)
 Label(tk, text="Student Depth Chart: ").grid(row=1, column=0)
 datafilelbl = Label(tk, text="no file selected")
 datafilelbl.grid(row=1, column=1)
-Button(tk, text="Choose File...", command=dataChoose).grid(row=1, column=2)
+Button(tk, text="Choose File...", command=datachoose).grid(row=1, column=2)
 
 Label(tk, text="Schedule File: ").grid(row=2, column=0)
 schedulefilelbl = Label(tk, text="no file selected")
 schedulefilelbl.grid(row=2, column=1)
-Button(tk, text="Choose File...", command=scheduleChoose).grid(row=2, column=2)
+Button(tk, text="Choose File...", command=schedulechoose).grid(row=2, column=2)
 
 Button(tk, text="Schedule!", command=schedule).grid(row=3, column=1)
-
-errorlbl = Label(tk, text="", fg="white")
-errorlbl.grid(row=4, column=1)
 
 tk.mainloop()
