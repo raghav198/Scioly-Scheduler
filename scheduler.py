@@ -1,10 +1,6 @@
 import numpy as np
 from tkinter import *
 from tkinter import filedialog, messagebox
-'''
-datafilename = input("Data chart file (.csv): ")
-schedulefilename = input("Schedule file (.csv): ")
-'''
 
 datafilename = ""
 schedulefilename = ""
@@ -105,57 +101,3 @@ errorlbl = Label(tk, text="", fg="white")
 errorlbl.grid(row=4, column=1)
 
 tk.mainloop()
-'''
-datafile = open(datafilename, 'r')
-data = datafile.read().splitlines()
-schedulefile = open(schedulefilename, 'r')
-schedule = schedulefile.read().splitlines()
-
-for i in range(len(data)): data[i] = data[i].split(',')
-for i in range(len(schedule)): schedule[i] = schedule[i].split(',')
-
-students = []
-events = data[0]
-times = data[0]
-
-for i in range(1, len(events)):
-    for j in range(3, len(schedule[i]) - 1):
-        if schedule[i][j] != '': times[i] = j - 3
-
-times.pop(0)
-times.pop(0)
-
-print(times)
-
-for i in range(1, len(data)):
-    for j in range(len(data[i])):
-        try: int(data[i][j])
-        except:
-            if data[i][j] not in students and data[i][j] != '':
-                students.append(data[i][j])
-
-students = np.unique(np.array(students))
-
-sch_array = []
-
-for i in range(len(events)):
-    pass
-
-skills = []
-for student in students: skills.append([])
-for i in range(len(skills)):
-    for j in range(len(events) + 1): skills[i].append(0)
-
-print(len(data[0]))
-print(len(skills[0]))
-
-for s in range(len(students)):
-    for i in range(len(data)):
-        for j in range(len(data[i])):
-            #print(len(data[i]))
-            if data[i][j] == students[s]:
-                skills[s][j - 1] = i
-
-print(students)
-print(skills)
-'''
