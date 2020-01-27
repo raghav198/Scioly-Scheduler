@@ -1,6 +1,7 @@
+import os
+
 import cvxpy
 import numpy as np
-import os
 
 NUM_TEAMS = 1
 TEAM_SIZE = 5
@@ -71,8 +72,6 @@ def optimize_teams(skills, schedule, NUM_TEAMS, TEAM_SIZE):
 
 
 if __name__ == "__main__":
-    
-
     skills = None
     if os.path.exists('skills.txt'):
         skills = np.loadtxt('skills.txt')
@@ -91,7 +90,6 @@ if __name__ == "__main__":
         [0, 0, 1, 1]])
 
     event_assignments, team_assignments = optimize_teams(skills, schedule, NUM_TEAMS, TEAM_SIZE)
-
 
     print("======Student Participation======")
     for student in range(NUM_STUDENTS):
@@ -129,5 +127,4 @@ for j in range(NUM_EVENTS):
 # print(skills)
 # print(assignments.value > 0.5)
 # print(teams.value > 0.5)
-
 """
