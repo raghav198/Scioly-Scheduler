@@ -13,9 +13,6 @@ def datachoose():
     if tk.filename != '':
         datafilelbl.config(text=tk.filename)
         datafilename = tk.filename
-        try: errorlbl.destroy()
-        except: pass
-
 
 def schedulechoose():
     global schedulefilename, errorlbl
@@ -24,9 +21,6 @@ def schedulechoose():
     if tk.filename != '':
         schedulefilelbl.config(text=tk.filename)
         schedulefilename = tk.filename
-        try: errorlbl.destroy()
-        except: pass
-
 
 def schedule():
     try:
@@ -91,13 +85,10 @@ def schedule():
 def fileerror():
     messagebox.showerror("File Error",
                          "Ensure that the correct files have been entered and the files have the correct formats...")
-    errorlbl = Label(tk, text="", fg="white")
-    errorlbl.grid(row=4, column=1)
-    errorlbl.config(text="File Error!", fg="red")
 
 
 tk = Tk()
-
+tk.title("SciOly Scheduler")
 tk.resizable(False, False)
 
 Label(tk, text="Student Depth Chart: ").grid(row=1, column=0)
