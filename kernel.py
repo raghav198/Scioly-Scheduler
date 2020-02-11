@@ -9,11 +9,12 @@ NUM_STUDENTS = 12
 NUM_EVENTS = 4
 NUM_SLOTS = 2
 
+
 def create_aux_product(var1, var2, dim1, dim2, dim_share):
     aux = [[cvxpy.Variable(dim_share) for k in range(dim2)] for j in range(dim1)]
     aux_constraints = [aux[j][k] <= var1[:, j]
-                        for j in range(dim1)
-                        for k in range(dim2)]
+                       for j in range(dim1)
+                       for k in range(dim2)]
     aux_constraints += [aux[j][k] <= var2[:, k]
                         for j in range(dim1)
                         for k in range(dim2)]
@@ -22,8 +23,8 @@ def create_aux_product(var1, var2, dim1, dim2, dim_share):
                         for k in range(dim2)]
 
     aux_constraints += [aux[j][k] >= 0
-                            for j in range(dim1)
-                            for k in range(dim2)]
+                        for j in range(dim1)
+                        for k in range(dim2)]
 
     return aux, aux_constraints
 
@@ -34,36 +35,33 @@ def optimize_teams(skills, schedule, NUM_TEAMS, TEAM_SIZE):
     assert _NUM_EVENTS_1 == _NUM_EVENTS_2
     NUM_EVENTS = _NUM_EVENTS_1
 
-
     assignments = cvxpy.Variable((NUM_STUDENTS, NUM_EVENTS), boolean=True)
     teams = cvxpy.Variable((NUM_STUDENTS, NUM_TEAMS), boolean=True)
 
     objective = cvxpy.sum(cvxpy.multiply(assignments, skills))
 
     students_per_team = [cvxpy.sum(teams[:, k]) <= TEAM_SIZE
-                            for k in range(NUM_TEAMS)]
-
+                         for k in range(NUM_TEAMS)]
 
     spe_aux, spe_aux_constraints = create_aux_product(assignments, teams, NUM_EVENTS, NUM_TEAMS, NUM_STUDENTS)
 
     students_per_event = spe_aux_constraints + [cvxpy.sum(spe_aux[j][k]) <= 2
-                                                    for j in range(NUM_EVENTS)
-                                                    for k in range(NUM_TEAMS)]
+                                                for j in range(NUM_EVENTS)
+                                                for k in range(NUM_TEAMS)]
 
     no_time_conflicts = [cvxpy.sum(cvxpy.multiply(assignments[i, :], schedule[h, :])) <= 1
-                            for i in range(NUM_STUDENTS)
-                            for h in range(NUM_SLOTS)]
+                         for i in range(NUM_STUDENTS)
+                         for h in range(NUM_SLOTS)]
 
     team_placement = [cvxpy.sum(teams[i, :]) <= 1 for i in range(NUM_STUDENTS)] + [
-                        cvxpy.sum(assignments[i, :]) <= NUM_EVENTS * cvxpy.sum(teams[i, :])
-                            for i in range(NUM_STUDENTS)]
+        cvxpy.sum(assignments[i, :]) <= NUM_EVENTS * cvxpy.sum(teams[i, :])
+        for i in range(NUM_STUDENTS)]
 
     non_negativity = [teams >= 0, assignments >= 0]
 
-
-    problem = cvxpy.Problem(cvxpy.Maximize(objective), constraints=non_negativity + students_per_team + students_per_event + no_time_conflicts + team_placement)
+    problem = cvxpy.Problem(cvxpy.Maximize(objective),
+                            constraints=non_negativity + students_per_team + students_per_event + no_time_conflicts + team_placement)
     problem.solve(solver='CPLEX')
-
 
     event_assignments = assignments.value > 0.5
     team_assignments = teams.value > 0.5
@@ -83,18 +81,19 @@ if __name__ == "__main__":
             np.random.rand(NUM_STUDENTS, NUM_EVENTS),
             _event_participation)
 
-        np.savetxt('skills.txt', skills)
-
+        # np.savetxt('skills.txt', skills)
+    print(skills)
     schedule = np.array(
         [[1, 1, 0, 0],
-        [0, 0, 1, 1]])
+         [0, 0, 1, 1]])
 
     event_assignments, team_assignments = optimize_teams(skills, schedule, NUM_TEAMS, TEAM_SIZE)
 
     print("======Student Participation======")
     for student in range(NUM_STUDENTS):
         events, = np.where(event_assignments[student, :])
-        print(f"Student #{student} is participating in the following events: {events} and has skills {skills[student, :]}")
+        print(
+            f"Student #{student} is participating in the following events: {events} and has skills {skills[student, :]}")
 
     print()
     print("======Team Assignment======")
@@ -107,7 +106,6 @@ if __name__ == "__main__":
     for event in range(NUM_EVENTS):
         students, = np.where(event_assignments[:, event])
         print(f"Event {event} has students {students} participating")
-
 
 """
 print("\n\nVerifying values")

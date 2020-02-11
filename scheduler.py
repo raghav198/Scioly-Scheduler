@@ -1,9 +1,12 @@
 from tkinter import *
 from tkinter import filedialog, messagebox
 import numpy as np
+import kernel
 
 datafilename = ""
 schedulefilename = ""
+
+NUM_TEAMS = 1
 
 
 def datachoose():
@@ -14,6 +17,7 @@ def datachoose():
         datafilelbl.config(text=tk.filename)
         datafilename = tk.filename
 
+
 def schedulechoose():
     global schedulefilename, errorlbl
     tk.filename = filedialog.askopenfilename(initialdir="/", title="Select file",
@@ -21,6 +25,7 @@ def schedulechoose():
     if tk.filename != '':
         schedulefilelbl.config(text=tk.filename)
         schedulefilename = tk.filename
+
 
 def schedule():
     try:
@@ -40,10 +45,23 @@ def schedule():
             for j in range(3, len(schedule[i]) - 1):
                 if schedule[i][j] != '': times[i] = j - 3
 
-        times.pop(0)
-        times.pop(0)
+        del times[0:1]
 
         print(times)
+        schedule = []
+
+        for i in range(max(times)): schedule.append([])
+        for i in range(len(schedule)):
+            for j in range(len(events)):
+                if times[j] == i:
+                    schedule[i].append(1)
+                else:
+                    schedule[i].append(0)
+
+        print(schedule)
+        schedule = np.array(schedule)
+
+        print(schedule)
 
         for i in range(1, len(data)):
             for j in range(len(data[i])):
@@ -54,11 +72,6 @@ def schedule():
                         students.append(data[i][j])
 
         students = np.unique(np.array(students))
-
-        sch_array = []
-
-        for i in range(len(events)):
-            pass
 
         skills = []
         for student in students: skills.append([])
@@ -78,7 +91,7 @@ def schedule():
         print(students)
         print(skills)
 
-    except:
+    except FileNotFoundError:
         fileerror()
 
 
