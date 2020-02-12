@@ -76,7 +76,7 @@ def schedule():
         skills = []
         for student in students: skills.append([])
         for i in range(len(skills)):
-            for j in range(len(events) + 1): skills[i].append(0)
+            for j in range(len(events)): skills[i].append(0)
 
         print(len(data[0]))
         print(len(skills[0]))
@@ -88,9 +88,36 @@ def schedule():
                     if data[i][j] == students[s]:
                         skills[s][j - 1] = i
 
+        for i in range(len(events)):
+            maximum = 0;
+            for s in range(len(skills)):
+                if skills[s][i] > maximum: maximum = skills[s][i]
+            for s in range(len(skills)):
+                skills[s][i] = skills[s][i] / maximum
+
+        skills = np.array(skills)
         print(students)
         print(skills)
 
+        event_assignments, team_assignments = kernel.optimize_teams(skills, schedule, NUM_TEAMS, 15)
+
+        print("======Student Participation======")
+        for student in range(len(students)):
+            events, = np.where(event_assignments[student, :])
+            print(
+                f"Student #{student} is participating in the following events: {events} and has skills {skills[student, :]}")
+
+        print()
+        print("======Team Assignment======")
+        for team in range(NUM_TEAMS):
+            students, = np.where(team_assignments[:, team])
+            print(f"Team {team} has the following students: {students}")
+
+        print()
+        print("======Event Assignment======")
+        for event in range(len(events)):
+            students, = np.where(event_assignments[:, event])
+            print(f"Event {event} has students {students} participating")
     except FileNotFoundError:
         fileerror()
 
