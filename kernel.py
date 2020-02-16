@@ -61,7 +61,7 @@ def optimize_teams(skills, schedule, NUM_TEAMS, TEAM_SIZE):
 
     problem = cvxpy.Problem(cvxpy.Maximize(objective),
                             constraints=non_negativity + students_per_team + students_per_event + no_time_conflicts + team_placement)
-    problem.solve(solver='CPLEX')
+    problem.solve(solver='GLPK_MI')
 
     event_assignments = assignments.value > 0.5
     team_assignments = teams.value > 0.5
